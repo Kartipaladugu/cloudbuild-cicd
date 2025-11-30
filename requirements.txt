@@ -1,0 +1,10 @@
+# Core App Dependencies
+google-cloud-bigquery==2.34.4
+Flask==2.3.3      # Upgraded slightly for better compatibility
+Werkzeug==2.3.8   # PINNED to a version compatible with Flask 2.x
+gunicorn==20.1.0
+pandas
+pyarrow
+
+# Testing Dependency
+pytest
