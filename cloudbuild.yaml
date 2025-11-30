@@ -1,15 +1,11 @@
-# Final Cloud Build configuration using Artifact Registry (GAR)
-
 steps:
 # 1. Build the Docker Image 🐳
-# Tagging the image with the Artifact Registry (GAR) multi-region US path.
 - name: 'gcr.io/cloud-builders/docker'
   id: Build
   args:
     - 'build'
     - '-t'
-    # Uses: us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$_TAG
-    - 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$_TAG'
+    - 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$COMMIT_SHA'
     - '.'
 
 # 2. Push the Docker Image to Artifact Registry (GAR) ⬆️
@@ -17,11 +13,10 @@ steps:
   id: Push-to-GAR
   args:
     - 'push'
-    - 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$_TAG'
+    - 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$COMMIT_SHA'
 
 # 3. Run Unit Tests (using the built image as the runner) ✅
-# The name MUST include a tag ($_TAG) for Cloud Build to parse the reference.
-- name: 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$_TAG'
+- name: 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$COMMIT_SHA'
   id: Unit-Tests
   entrypoint: 'bash'
   args:
@@ -36,16 +31,16 @@ steps:
   args:
     - 'run'
     - 'deploy'
-    - 'py-bq-load' # Service name used in successful attempts
+    - 'py-bq-load'
     - '--image'
-    - 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$_TAG'
+    - 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$COMMIT_SHA'
     - '--region'
     - 'us-central1'
     - '--allow-unauthenticated'
 
-# Specify the image that Cloud Build should tag and push
+# List the image that Cloud Build should tag and push
 images:
-- 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$_TAG'
+- 'us-docker.pkg.dev/mlops-479014/demo-flask-images/demo-flask-app:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
